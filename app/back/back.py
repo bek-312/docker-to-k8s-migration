@@ -1,15 +1,19 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort
 from random import randint
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
-from sqlalchemy import exc
+from sqlalchemy import text, exc
 import json
-from random import randint
-from flask import request
+import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@data:3306/mydatabase'
+
+# Read from env; keep a fallback so your old docker-compose still works locally
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'SQLALCHEMY_DATABASE_URI',
+    'mysql+pymysql://root:root@data:3306/mydatabase'
+)
 app.config['SQLALCHEMY_ECHO'] = True
+
 db = SQLAlchemy(app)
 #app.secret_key = 'changethis'
 
