@@ -192,3 +192,34 @@ Review all the Kubernetes yaml files created and compare to docker-compose. No n
  
 
 Save the result files somewhere as you might need them in the future assignments
+
+
+
+
+
+# minikube
+# install minikube
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+# start a local cluster using Docker
+minikube start --driver=docker
+
+# create a namespace for the app
+kubectl create namespace quotes
+
+# apply resources in a good order
+kubectl apply -n quotes -f k8s/data-deployment.yaml -f k8s/data-service.yaml
+kubectl rollout status -n quotes deploy/data
+
+kubectl apply -n quotes -f k8s/data-script-deployment.yaml   # seeder (we’ll convert to Job later)
+# optional: watch logs to confirm it ran once
+kubectl logs -n quotes deploy/data-script --tail=100 || true
+
+kubectl apply -n quotes -f k8s/back-deployment.yaml -f k8s/back-service.yaml
+kubectl rollout status -n quotes deploy/back
+
+kubectl apply -n quotes -f k8s/api-service.yaml
+
+kubectl apply -n quotes -f k8s/front-deployment.yaml -f k8s/front-service.yaml
+kubectl rollout status -n quotes deploy/front
