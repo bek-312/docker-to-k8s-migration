@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  data:
+    image: blueapple685/quotes-data:v1
+    environment:
+      MYSQL_DATABASE: mydatabase
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306:3306"
+    networks:
+      - myapp
+
+  data-script:
+    image: blueapple685/quotes-data-script:v1
+    environment:
+      MYSQL_HOST: data
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    networks:
+      - myapp
+
+  back:
+    image: blueapple685/quotes-back:v1
+    ports:
+      - "3000:3000"
+    networks:
+      - myapp
+
+  front:
+    image: blueapple685/quotes-front:v1
+    ports:
+      - "3001:3001"
+    networks:
+      - myapp
+
+networks:
+  myapp: {}
