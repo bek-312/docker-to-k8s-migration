@@ -1,11 +1,13 @@
-FROM alpine
+FROM alpine:3.20
 
-RUN apk update && apk add --no-cache mysql-client bash
+# we only need mysql-client (bash not required if your script uses /usr/bin/env sh)
+RUN apk update && apk add --no-cache mysql-client
 
 WORKDIR /opt
-
 COPY mydatabase.sql import.sh /opt/
 
-RUN chmod +x /opt/import.sh
+# normalize line endings (in case of CRLF) and ensure executable
+RUN sed -i 's/\r$//' /opt/import.sh && chmod +x /opt/import.sh
 
-CMD ["/opt/import.sh"]
+# run via sh to avoid exec format issues even if shebang is missing/wrong
+CMD ["/bin/sh", "-c", "/opt/import.sh"]
