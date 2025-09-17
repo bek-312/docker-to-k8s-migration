@@ -1,60 +1,36 @@
-# remove 'version:' to silence the warning
+version: "3.8"
 
 services:
   data:
-    container_name: db
-    build:
-      context: ./app/data
-      dockerfile: Dockerfile
-    ports:
-      - "3306:3306"
+    image: blueapple685/quotes-data:v1
     environment:
       MYSQL_DATABASE: mydatabase
       MYSQL_ROOT_PASSWORD: root
       MYSQL_PASSWORD: root
+    ports:
+      - "3306:3306"
     networks: [myapp]
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
 
   data-script:
-    container_name: data-script
-    build:
-      context: ./app/data-script
-      dockerfile: Dockerfile
+    image: blueapple685/quotes-data-script:v1
     environment:
-      MYSQL_HOST: db
+      MYSQL_HOST: data
       MYSQL_USER: root
       MYSQL_PASSWORD: root
-    depends_on:
-      data:
-        condition: service_healthy
     networks: [myapp]
 
   back:
-    container_name: api
-    build:
-      context: ./app/back
-      dockerfile: Dockerfile
+    image: blueapple685/quotes-back:v1
     ports:
       - "3000:3000"
-    depends_on:
-      data:
-        condition: service_healthy
     networks:
       myapp:
-        aliases: [api]  # lets front call http://api:3000
+        aliases: [api]
 
   front:
-    container_name: front
-    build:
-      context: ./app/front
-      dockerfile: Dockerfile
+    image: blueapple685/quotes-front:v1
     ports:
       - "3001:3001"
-    depends_on: [back]
     networks: [myapp]
 
 networks:
